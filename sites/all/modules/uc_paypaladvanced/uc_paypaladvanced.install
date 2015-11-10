@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Paypal Payments Advanced module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+
+
+function uc_paypaladvanced_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+
+  $has_curl = function_exists('curl_init');
+
+  // PayPal advanced requires cURL.
+
+    $requirements['uc_paypaladvanced_curl'] = array(
+      'title' => $t('cURL'),
+      'value' => $has_curl ? $t('Enabled') : $t('Not found'),
+    );
+    if (!$has_curl) {
+      $requirements['uc_paypaladvanced_curl']['severity'] = REQUIREMENT_ERROR;
+      $requirements['uc_paypaladvanced_curl']['description'] = $t("PayPal Advanced requires the PHP <a href='!curl_url'>cURL</a> library.", array('!curl_url' => 'http://php.net/manual/en/curl.setup.php'));
+    }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+
+
+function uc_paypaladvanced_uninstall() {
+  db_drop_table('uc_payment_paypal_advanced');
+}
+
+
+/**
+ * Implements hook_install().
+ */
+
+
+function uc_paypaladvanced_install() {
+
+$schema['uc_payment_paypal_advanced'] = array(
+    'description' => 'Paypal Advanced payments.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'order_id' => array(
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'transaction_id' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'transaction_type' => array(
+         'type' => 'varchar',
+         'length' => '255',
+       ),
+    ),
+    'primary key' => array('id'),
+  );
+  db_create_table('uc_payment_paypal_advanced', $schema['uc_payment_paypal_advanced']);
+}

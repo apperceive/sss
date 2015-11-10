@@ -1,0 +1,126 @@
+
+/* Clean file for your awesome overrides, enable in the info file to use. */
+
+/*
+body.fpcc-3.front #main-content article.node-product {
+  border: solid thin black;
+  border-radius: 4px;
+  box-shadow: 4px 4px #ccc;
+  padding: 3px;
+  margin: 5px;
+  width: 31%;
+  height: 540px;
+  overflow: hidden;
+}
+*/
+
+body.fpcc-3.front #content article.node-page {
+  width: 100%;
+}
+
+body.fpcc-3.page-programs #main-content article.node-product {
+  border: solid thin black;
+  border-radius: 4px;
+  box-shadow: 4px 4px #ccc;
+  padding: 3px;
+  margin: 5px;
+  height: 540px;
+  overflow: hidden;
+}
+
+body.fpcc-3.page-programs #main-content ul li {
+  list-style: none;
+  display: inline-block;
+  width: 320px;
+  vertical-align: top;
+}
+
+.sss-fp-footer {
+  padding: 20px 0 0 0;
+}
+
+#block-uc-cart-cart {
+  position: relative;
+  top: -25px;
+}
+
+/* twitter and facebook */
+#block-block-4 {
+  width: 260px;
+  
+}
+
+#block-block-4 a {
+  font-size: 80%;
+}
+
+#block-block-4 a img {
+  height: 20px;
+}
+
+body.front article.node-page h1.node-title {
+  display: none;
+}
+
+#menu-bar nav ul.menu li.sf-depth-1 a.sf-depth-1 {
+  border: none;
+}
+
+/* does not work for admin  because this is an admin page and this file is not included */
+body.page-admin-store-orders .field-name-field-order-po-number {
+  border: solid thin #bbb;
+  display: block;
+  width: 180px;
+  float: left;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+
+body.page-admin-store-orders-edit .field-name-field-order-po-number {
+  border: solid thin #bbb;
+  display: block;
+  width: auto;
+  float: none;
+  margin: auto;
+  padding: auto;
+}
+
+body.page-admin-store-orders .field-name-field-order-po-number h2.field-label {
+  color: #666;
+}
+
+h1#site-name {
+  position: relative;
+  top: 80px;
+  font-size: 3.5em;
+}
+
+#header-wrapper {
+  height: 220px;
+}
+
+#header-wrapper .region-header {
+  position: relative;
+  top: -200px;
+}
+
+#menu-wrapper {
+  position: relative;
+  top: -160px;
+}
+
+body.firefox #menu-wrapper {
+  position: relative;
+  top: -115px;
+}
+
+#main-content,
+.region-highlighted {
+  /*position: relative;
+  top: -140px;*/
+}
+
+.slideshow-caption {
+  display: none;
+}
+

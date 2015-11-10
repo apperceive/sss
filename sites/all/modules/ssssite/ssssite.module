@@ -1,0 +1,163 @@
+<?php
+
+/**
+ * @file
+ * ssssite.module - studentsuccessskills site customizations
+ */
+
+/**
+ * Implements hook_menu().
+ */
+
+function ssssite_menu() {
+  $items['sss/process/payment'] = array(
+    'page callback' => 'sss_process_payment',
+    //'page arguments' => array(1, 2),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+/*  
+$items['accessrevoke/%/%'] = array(
+    'page callback' => 'sss_accessrevoke',
+    'page arguments' => array(1, 2),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['manage/email/settings'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sss_email_settings'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['accessadd/%'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sss_accessadd', 1),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );  
+  $items['accept_terms'] = array(
+    'page callback' => 'sss_accept_terms',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+*/
+  return $items;
+}  // ssssite_menu
+
+
+function sss_process_payment() {
+  
+  //dpm($_POST);
+  //dpm($_GET);
+  watchdog('sss', "PayPal post: " . var_export($_POST, 1) . " PayPal get: " . var_export($_GET, 1));
+
+  return "Thank you!";
+}
+
+
+/**
+ * Implementation of hook_order_pane().
+ *
+ * see http://www.ubercart.org/docs/api/hook_order_pane
+ *
+ */
+function ssssite_uc_order_pane() {
+  //dpm(get_defined_vars());
+  $panes = array();
+  /*
+   $panes[] = array(
+    'id' => 'test2',
+    'callback' => 'ssssite_checkout_pane_cart',
+    'title' => t('TEST2'),
+    'desc' => t('TEST pane for an order.'),
+    'class' => 'pos-left',
+    'weight' => 4,
+    //'show' => array('view', 'edit', 'customer'),
+   );
+  */
+  return $panes;
+} // ssssite_pane
+
+
+/**
+  * Implementation of hook_checkout_pane().
+  *
+  * see http://www.ubercart.org/docs/api/hook_checkout_pane
+  *
+  */
+function ssssite_uc_checkout_pane() {
+  //dpm(get_defined_vars());
+  $panes = array();
+  /*
+  $panes[] = array(
+     'id' => 'test',
+     'callback' => 'ssssite_checkout_pane_cart',
+     'title' => t('TEST'),
+     'desc' => t("Display test pane."),
+     'weight' => 5,
+     'process' => FALSE,
+     'collapsible' => FALSE,
+  );
+  */
+  return $panes;
+} // ssssite_checkout_pane
+
+// callback builder function
+// see http://www.ubercart.org/docs/developer/245/checkout
+function ssssite_uc_checkout_pane_cart($op, &$arg1, $arg2) {
+
+}
+
+/**
+  * Implementation of hook_order().
+  *
+  * see http://www.ubercart.org/docs/api/hook_order
+  *
+  */
+function ssssite_uc_order($op, &$arg1, $arg2) {
+  //dpm(get_defined_vars());
+  //dpm($_POST[]);
+  switch ($op) {
+     case 'save':
+       // Do something to save payment info!
+       break;
+  }
+} // ssssite_order
+
+
+
+function ssssite_uc_payment_method() {
+  $methods = array();
+  /*
+  $methods[] = array(
+    'id' => 'ponumber',
+    'name' => t('Purchase Order'),
+    'title' => t('Purchase Order'),
+    'desc' => t('Pay using a purchase order.'),
+    'callback' => 'ssssite_payment_method_ponumber',
+    'weight' => 1,
+    'checkout' => TRUE,
+  );
+  */
+  return $methods;
+} // ssssite_payment_method
+
+
+/*
+function ssssite_payment_method_ponumber($op, &$order, $form = NULL, &$form_state = NULL) {
+  switch ($op) {
+    case 'view':
+  }
+
+} // ssssite_payment_method_ponumber
+*/
+
+function ssssite_uc_checkout_pane_alter(&$panes) {
+  ////dpm(get_defined_vars());
+}
+
+
+
+
+

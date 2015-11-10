@@ -1,0 +1,228 @@
+<?php
+
+/**
+ * @file
+ * Integrates paypaladvanced payment service.
+ */
+
+
+/**
+ * Implements hook_help().
+ */
+function uc_paypaladvanced_help($path, $arg) {
+  switch ($path) {
+    case 'admin/store/settings/payment/method/%':
+      if ($arg[5] == 'paypaladvanced') {
+        return '<p>' . t('To accept PayPal payments in paypaladvanced, please ensure that demo mode is disabled and your store currency is one of USD, AUD, CAD, EUR or GBP.') . '</p>';
+      }
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function uc_paypaladvanced_menu() {
+  $items = array();
+
+  $items['cart/paypaladvanced/complete'] = array(
+    'title' => 'Paypal Advanced Payment complete',
+    'page callback' => 'uc_paypaladvanced_complete',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'uc_paypaladvanced.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_init().
+ */
+function uc_paypaladvanced_init() {
+  global $conf;
+  $conf['i18n_variables'][] = 'uc_paypaladvanced_method_title';
+  $conf['i18n_variables'][] = 'uc_paypaladvanced_checkout_button';
+
+}
+
+/**
+ * Implements hook_ucga_display().
+ */
+function uc_paypaladvanced_ucga_display() {
+  // Tell UC Google Analytics to display the e-commerce JS on the custom
+  // order completion page for this module.
+  if (arg(0) == 'cart' && arg(1) == 'paypaladvanced' && arg(2) == 'complete') {
+    return TRUE;
+  }
+}
+
+/**
+ * Implements hook_uc_payment_method().
+ *
+ * @see uc_payment_method_paypaladvanced()
+ */
+function uc_paypaladvanced_uc_payment_method() {
+  $path = base_path() . drupal_get_path('module', 'uc_paypaladvanced');
+  $title = variable_get('uc_paypaladvanced_method_title', t('Paypal Advanced:'));
+  $title .= '<br />' . theme('image', array(
+    'path' => drupal_get_path('module', 'uc_paypaladvanced') . '/paypaladvanced.gif',
+    'attributes' => array('class' => array('uc-paypaladvanced-logo')),
+  ));
+
+  $methods['paypaladvanced'] = array(
+    'name' => t('Paypal Advanced'),
+    'title' => $title,
+    'review' => t('Paypal Advanced'),
+    'desc' => t('Paypal Advanced Payment.'),
+    'callback' => 'uc_payment_method_paypaladvanced',
+    'redirect' => 'uc_paypaladvanced_form',
+    'weight' => 3,
+    'checkout' => TRUE,
+    'no_gateway' => TRUE,
+  );
+
+  return $methods;
+}
+
+
+/**
+ * Adds paypaladvanced settings to the payment method settings form.
+ *
+ * @see uc_paypaladvanced_uc_payment_method()
+ */
+function uc_payment_method_paypaladvanced($op, &$order, $form = NULL, &$form_state = NULL) {
+  
+  switch ($op) {
+
+    case 'cart-review':
+  
+?>
+  <style>
+  .order-review-table
+  {
+    width: 500px !important;
+  }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
+  </script>
+    <script>
+      $(document).ready(function(){
+      $(".order-review-table #edit-submit").click(function(){
+      $(".order-review-table").append('<tr><td colspan="2"><iframe src="" name="paypaladvanced" id="paypaladvanced" frameborder="0" width="100%" scrolling="no"></iframe></td></tr>');
+      $("#paypaladvanced").css("height","600px");	
+      });
+    });
+  </script>  
+ 
+  <?php
+   break;
+   case 'order-view':
+      $txn_id = db_query("SELECT transaction_id FROM {uc_payment_paypal_advanced} WHERE order_id = :id ORDER BY id ASC", array(':id' => $order->order_id))->fetchField();
+      if (empty($txn_id)) {
+        $txn_id = t('Unknown');
+      }
+
+      $build['#markup'] = t('Transaction ID:<br />@txn_id', array('@txn_id' => $txn_id));
+      return $build;
+
+   case 'customer-view':
+    $txn_id = db_query("SELECT transaction_id FROM {uc_payment_paypal_advanced} WHERE order_id = :id ORDER BY id ASC", array(':id' => $order->order_id))->fetchField();
+      if (empty($txn_id)) {
+        $txn_id = t('Unknown');
+      }
+
+      $build['#markup'] = t('Transaction ID:<br />@txn_id', array('@txn_id' => $txn_id));
+      return $build;
+    
+  	
+   case 'settings':
+     $form['uc_paypaladvanced_partner'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Paypal API Partner name'),
+        '#description' => t('Your paypal advanced partner name.'),
+        '#default_value' => variable_get('uc_paypaladvanced_partner', ''),
+        '#size' => 16,
+      );
+            $form['uc_paypaladvanced_vendor'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Paypal API Vendor name'),
+        '#description' => t('Your paypal advanced vendor name.'),
+        '#default_value' => variable_get('uc_paypaladvanced_vendor', ''),
+        '#size' => 16,
+      );
+
+      $form['uc_paypaladvanced_user'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Paypal API Username'),
+        '#description' => t('Your paypal advanced user name.'),
+        '#default_value' => variable_get('uc_paypaladvanced_user', ''),
+        '#size' => 16,
+      );
+      $form['uc_paypaladvanced_password'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Paypal API Password'),
+        '#description' => t('Your paypal advanced password.'),
+        '#default_value' => variable_get('uc_paypaladvanced_password', ''),
+        '#size' => 16,
+      );
+      $form['uc_paypaladvanced_mode'] = array(
+        '#type' => 'select',
+        '#title' => t('Mode'),
+        '#options' => array(
+          'test' => t('Test'),
+          'live' => t('Live'),
+        ),
+        '#default_value' => variable_get('uc_paypaladvanced_mode', 'test'),
+      );
+      $form['uc_paypaladvanced_transaction'] = array(
+        '#type' => 'select',
+        '#title' => t('Transaction Method'),
+        '#options' => array(
+          'A' => t('Authorization'),
+          'S' => t('Sale'),
+        ),
+        '#default_value' => variable_get('uc_paypaladvanced_transaction', 'authorization'),
+      );
+
+      return $form;
+  }
+}
+
+/**
+ * Form to build the submission to paypaladvanced.
+ */
+function uc_paypaladvanced_form($form, &$form_state, $order) {
+  global $user;
+  require_once("payflow.php");
+ 
+  $payflow= new payflow();
+  $tokenResponse= $payflow->getSecureToken($order);
+  $secureToken = $payflow->getMySecureToken($tokenResponse);
+  $response=$payflow->parseResponse($tokenResponse);
+ 	
+  $form['SECURETOKEN'] = array(
+      '#type' => 'hidden',
+      '#value' => $secureToken,
+    );
+  $form['SECURETOKENID'] = array(
+      '#type' => 'hidden',
+      '#value' =>  $response['SECURETOKENID'],
+    );
+  $form['MODE'] = array(
+      '#type' => 'hidden',
+      '#value' =>  $payflow->mode,
+    );
+
+  $form['#action'] = "https://payflowlink.paypal.com/";
+
+  $form['#attributes'] = array('target' => 'paypaladvanced');
+  $form['#name'] = "egrpaypaladvanced";
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Continue',
+  );
+
+  return $form;
+}
+
